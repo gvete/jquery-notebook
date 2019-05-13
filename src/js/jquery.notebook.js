@@ -13,6 +13,11 @@
  *
  * Some functions of this plugin were based on Jacob Kelley's Medium.js
  * https://github.com/jakiestfu/Medium.js/
+ * 
+ * Added material icons compatibility and remove unwanted functionalities
+ * Foodies Star LLP.
+ * Author: Girish Vete <girish@foodiesstar.com>
+ * 
  */
 
 (function($, d, w) {
@@ -266,8 +271,8 @@
                     bubbleHeight = elem.height(),
                     offset = editor.offset().left,
                     pos = {
-                        x: (boundary.left + boundary.width / 2) - (bubbleWidth / 2),
-                        y: boundary.top - bubbleHeight - 8 + $(document).scrollTop()
+                        x: (boundary.left + boundary.width / 2) - (bubbleWidth / 2) - 100,
+                        y: boundary.top - bubbleHeight - 8 + $(document).scrollTop() - 70
                     };
                 transform.translate(elem, pos.x, pos.y);
             },
@@ -299,7 +304,7 @@
              * tags enclosing the selection.
              */
             checkForFormatting: function(currentNode, formats) {
-                var validFormats = ['b', 'i', 'u', 'h1', 'h2', 'ol', 'ul', 'li', 'a'];
+                var validFormats = ['b', 'i', 'u', 'a'];
                 if (currentNode.nodeName === '#text' ||
                     validFormats.indexOf(currentNode.nodeName.toLowerCase()) != -1) {
                     if (currentNode.nodeName != '#text') {
@@ -314,7 +319,15 @@
                     var li = utils.html.addTag(ul, 'li', false, false);
                     var btn = utils.html.addTag(li, 'button', false, false);
                     btn.attr('editor-command', options.modifiers[cmd]);
-                    btn.addClass(options.modifiers[cmd]);
+                    btn.addClass('material-icons notepad-cmenu');
+                    var txts = '';
+                    switch (options.modifiers[cmd]) {
+                        case 'anchor' : txts = 'insert_link'; break;
+                        case 'bold' : txts = 'format_bold'; break;
+                        case 'italic' : txts = 'format_italic'; break;
+                        case 'underline' : txts = 'format_underline'; break;
+                    }
+                    btn.text(txts);
                 }
                 elem.find('button').click(function(e) {
                     e.preventDefault();
@@ -328,6 +341,8 @@
                     type: 'text'
                 });
                 var closeBtn = utils.html.addTag(linkArea, 'button', false, false);
+                closeBtn.addClass('material-icons close-cmenu');
+                closeBtn.text('close');
                 closeBtn.click(function(e) {
                     e.preventDefault();
                     var editor = $(this).closest('.editor');
@@ -469,10 +484,10 @@
                 }
             },
             setContentArea: function(elem) {
-                var id = $('body').find('.jquery-editor').length + 1;
+                var id = $('body').find('.jquery-notebook').length + 1;
                 elem.attr('data-jquery-notebook-id', id);
                 var body = $('body');
-                contentArea = $('<textarea></textarea>');
+                var contentArea = $('<textarea></textarea>');
                 contentArea.css({
                     position: 'absolute',
                     left: -1000
@@ -644,7 +659,7 @@
                     utils.selection.restore(s);
                     d.execCommand('createLink', false, e.url);
                     bubble.update.call(this);
-                    events.change.call(this);
+                    events.change.call(e.target);
                 },
                 removeLink: function(e, s) {
                     var el = $(utils.selection.getContainer(s)).closest('a');
@@ -767,7 +782,8 @@
         autoFocus: false,
         placeholder: 'Your text here...',
         mode: 'multiline',
-        modifiers: ['bold', 'italic', 'underline', 'h1', 'h2', 'ol', 'ul', 'anchor']
+        modifiers: ['bold', 'italic', 'underline', 'anchor']
     };
 
 })(jQuery, document, window);
+
